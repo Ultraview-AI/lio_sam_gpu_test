@@ -22,6 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   message_generation
   visualization_msgs
+  swri_profiler
 )
 
 find_package(OpenMP REQUIRED)

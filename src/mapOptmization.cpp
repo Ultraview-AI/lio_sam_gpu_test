@@ -24,6 +24,8 @@
 #include "cuda_plane_line_odometry/scan_to_map_optimization.cuh"
 // cuda_plane_line_odometry
 
+#include "swri_profiler/profiler.h"
+
 // #define TRAJ_TXT_PATH "/home/lmf/lio-sam-output/traj.txt"
 
 using namespace gtsam;
@@ -1385,6 +1387,7 @@ public:
             cuda_scan_to_map_opt.BuildSurfAndCornerHashMap(surf_map_3d, corner_map_3d);
 
             auto dur_build_hashmap = std::chrono::system_clock::now() - now_build_hashmap;
+            std::cout << "build hashmap: " << dur_build_hashmap.count() << std::endl;
             total_dur_build_hashmap += dur_build_hashmap;
 
 
@@ -1400,6 +1403,7 @@ public:
                 cuda_scan_to_map_opt.SearchSurfAndCornerPointsWithHashMap();
 
                 auto dur_KNN_search = std::chrono::system_clock::now() - now_KNN_search;
+                std::cout << "KNN search: " << dur_KNN_search.count() << std::endl;
                 total_dur_KNN_search += dur_KNN_search;
 
 
@@ -1418,6 +1422,7 @@ public:
             // cuda_plane_line_odometry
 
             auto dur_one_frame = std::chrono::system_clock::now() - now_one_frame;
+            std::cout << "One frame: " << dur_one_frame.count() << std::endl;
             total_dur_one_frame += dur_one_frame;
             cur_dur_one_frame = std::chrono::duration_cast<std::chrono::microseconds>(dur_one_frame).count() / 1000.0;
 
