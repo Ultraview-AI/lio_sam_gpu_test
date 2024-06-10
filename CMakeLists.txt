@@ -23,6 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   visualization_msgs
   swri_profiler
+  swri_profiler_msgs
 )
 
 find_package(OpenMP REQUIRED)

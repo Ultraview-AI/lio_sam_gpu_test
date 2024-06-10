@@ -1295,6 +1295,7 @@ public:
             kdtreeSurfFromMap->setInputCloud(laserCloudSurfFromMapDS);
 
             auto dur_build_kdtree = std::chrono::system_clock::now() - now_build_kdtree;
+            std::cout << "KNN search: " << dur_build_kdtree.count() << std::endl;
             float cur_dur_build_kdtree = std::chrono::duration_cast<std::chrono::microseconds>(dur_build_kdtree).count() / 1000.0;
             total_dur_build_kdtree += dur_build_kdtree;
 
@@ -1321,6 +1322,7 @@ public:
 
     void scan2MapOptimizationWithCUDA()
     {
+        SWRI_PROFILE("scan2map-cuda");
         static unsigned int opt_count = 0;
         static unsigned int KNN_count = 0;
         static std::chrono::duration<double> total_dur_build_hashmap;
@@ -1437,6 +1439,7 @@ public:
 
     void transformUpdate()
     {
+        //SWRI_PROFILE("transform-update");
         if (cloudInfo.imuAvailable == true)
         {
             if (std::abs(cloudInfo.imuPitchInit) < 1.4)

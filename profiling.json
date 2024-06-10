@@ -1,0 +1,14 @@
+{
+    "name": "API Calls",
+    "metrics": [
+        {
+            "name": "cudaApiCalls",
+            "metrics": [
+                "ID",
+                "Name",
+                "Start",
+                "Duration"
+            ]
+        }
+    ]
+}
