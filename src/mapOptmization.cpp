@@ -765,7 +765,7 @@ public:
 
     void updateInitialGuess()
     {   
-        SWRI_PROFILE("update-initial-guess");
+        SWRI_PROFILE("update-initial-guess-mapop");
         // static int count = 0;
         // count++;
         // std::cout << "count : " << count << std::endl;
@@ -934,7 +934,7 @@ public:
 
     void extractSurroundingKeyFrames()
     {
-        SWRI_PROFILE("extract-surrounding-keyframes");
+        SWRI_PROFILE("extract-surrounding-keyframes-mapop");
         if (cloudKeyPoses3D->points.empty() == true)
             return; 
         
@@ -950,7 +950,7 @@ public:
 
     void downsampleCurrentScan()
     {
-        SWRI_PROFILE("downsample-current-scan");
+        SWRI_PROFILE("downsample-current-scan-mapop");
         // Downsample cloud from current scan
         laserCloudCornerLastDS->clear();
         downSizeFilterCorner.setInputCloud(laserCloudCornerLast);
@@ -1325,7 +1325,7 @@ public:
 
     void scan2MapOptimizationWithCUDA()
     {
-        SWRI_PROFILE("scan2map-cuda");
+        SWRI_PROFILE("scan2map-cuda-mapop");
         static unsigned int opt_count = 0;
         static unsigned int KNN_count = 0;
         static std::chrono::duration<double> total_dur_build_hashmap;
@@ -1442,7 +1442,7 @@ public:
 
     void transformUpdate()
     {
-        //SWRI_PROFILE("transform-update");
+        SWRI_PROFILE("transform-update-mapop");
         if (cloudInfo.imuAvailable == true)
         {
             if (std::abs(cloudInfo.imuPitchInit) < 1.4)
@@ -1622,7 +1622,7 @@ public:
 
     void saveKeyFramesAndFactor()
     {
-        SWRI_PROFILE("save-keyframes-and-factor");
+        SWRI_PROFILE("save-keyframes-and-factor-mapop");
         if (saveFrame() == false)
             return;
 
@@ -1709,7 +1709,7 @@ public:
 
     void correctPoses()
     {
-        SWRI_PROFILE("correct-poses");
+        SWRI_PROFILE("correct-poses-mapop");
         if (cloudKeyPoses3D->points.empty())
             return;
 
@@ -1760,7 +1760,7 @@ public:
 
     void publishOdometry()
     {
-        SWRI_PROFILE("publish-odometry");
+        SWRI_PROFILE("publish-odometry-mapop");
         // Publish odometry for ROS (global)
         nav_msgs::Odometry laserOdometryROS;
         laserOdometryROS.header.stamp = timeLaserInfoStamp;
@@ -1850,7 +1850,7 @@ public:
 
     void publishFrames()
     {
-        SWRI_PROFILE("publish-frames");
+        SWRI_PROFILE("publish-frames-mapop");
         if (cloudKeyPoses3D->points.empty())
             return;
         // publish key poses

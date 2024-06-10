@@ -5,7 +5,7 @@ import csv
 import os
 from swri_profiler_msgs.msg import ProfileDataArray
 
-csv_file_path = '/home/dev/lio_test_ws/src/lio_sam_gpu_test/python/profile_xavier.csv'
+csv_file_path = '/home/dev/lio_test_ws/src/lio_sam_gpu_test/python/profile_orin.csv'
 
 # Initialize the data storage
 data_storage = {}

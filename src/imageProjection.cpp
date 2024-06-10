@@ -1,5 +1,7 @@
 #include "utility.h"
 #include "lio_sam/cloud_info.h"
+#include "swri_profiler/profiler.h"
+
 
 struct VelodynePointXYZIRT
 {
@@ -104,6 +106,7 @@ public:
 
     void allocateMemory()
     {
+        SWRI_PROFILE("allocate-memory-image");
         laserCloudIn.reset(new pcl::PointCloud<PointXYZIRT>());
         tmpOusterCloudIn.reset(new pcl::PointCloud<OusterPointXYZIRT>());
         fullCloud.reset(new pcl::PointCloud<PointType>());
@@ -122,6 +125,7 @@ public:
 
     void resetParameters()
     {
+        SWRI_PROFILE("reset-parameters-image");
         laserCloudIn->clear();
         extractedCloud->clear();
         // reset range matrix for range image projection
@@ -144,6 +148,7 @@ public:
 
     void imuHandler(const sensor_msgs::Imu::ConstPtr& imuMsg)
     {
+        SWRI_PROFILE("imu-handler-image");
         sensor_msgs::Imu thisImu = imuConverter(*imuMsg);
 
         std::lock_guard<std::mutex> lock1(imuLock);
@@ -169,12 +174,14 @@ public:
 
     void odometryHandler(const nav_msgs::Odometry::ConstPtr& odometryMsg)
     {
+        SWRI_PROFILE("odometry-handler-image");
         std::lock_guard<std::mutex> lock2(odoLock);
         odomQueue.push_back(*odometryMsg);
     }
 
     void cloudHandler(const sensor_msgs::PointCloud2ConstPtr& laserCloudMsg)
     {
+        SWRI_PROFILE("cloud-handler-image");
         if (!cachePointCloud(laserCloudMsg))
             return;
 
@@ -192,6 +199,7 @@ public:
 
     bool cachePointCloud(const sensor_msgs::PointCloud2ConstPtr& laserCloudMsg)
     {
+        SWRI_PROFILE("cache-pointcloud-image");
         // cache point cloud
         cloudQueue.push_back(*laserCloudMsg);
         if (cloudQueue.size() <= 2)
@@ -281,6 +289,7 @@ public:
 
     bool deskewInfo()
     {
+        SWRI_PROFILE("deskew-info-image");
         std::lock_guard<std::mutex> lock1(imuLock);
         std::lock_guard<std::mutex> lock2(odoLock);
 
@@ -300,6 +309,7 @@ public:
 
     void imuDeskewInfo()
     {
+        SWRI_PROFILE("imu-deskew-info-image");
         cloudInfo.imuAvailable = false;
 
         while (!imuQueue.empty())
@@ -359,6 +369,7 @@ public:
 
     void odomDeskewInfo()
     {
+        SWRI_PROFILE("odom-deskew-info-image");
         cloudInfo.odomAvailable = false;
 
         while (!odomQueue.empty())
@@ -441,6 +452,7 @@ public:
 
     void findRotation(double pointTime, float *rotXCur, float *rotYCur, float *rotZCur)
     {
+        SWRI_PROFILE("find-rotation-image");
         *rotXCur = 0; *rotYCur = 0; *rotZCur = 0;
 
         int imuPointerFront = 0;
@@ -468,6 +480,7 @@ public:
 
     void findPosition(double relTime, float *posXCur, float *posYCur, float *posZCur)
     {
+        SWRI_PROFILE("find-position-image");
         *posXCur = 0; *posYCur = 0; *posZCur = 0;
 
         // If the sensor moves relatively slow, like walking speed, positional deskew seems to have little benefits. Thus code below is commented.
@@ -484,6 +497,7 @@ public:
 
     PointType deskewPoint(PointType *point, double relTime)
     {
+        SWRI_PROFILE("deskew-point-image");
         if (deskewFlag == -1 || cloudInfo.imuAvailable == false)
             return *point;
 
@@ -516,6 +530,7 @@ public:
 
     void projectPointCloud()
     {
+        SWRI_PROFILE("project-pointcloud-image");
         int cloudSize = laserCloudIn->points.size();
         // range image projection
         for (int i = 0; i < cloudSize; ++i)
@@ -561,6 +576,7 @@ public:
 
     void cloudExtraction()
     {
+        SWRI_PROFILE("cloud-extraction-image");
         int count = 0;
         // extract segmented cloud for lidar odometry
         for (int i = 0; i < N_SCAN; ++i)
@@ -587,6 +603,7 @@ public:
     
     void publishClouds()
     {
+        SWRI_PROFILE("publish-clouds-image");
         cloudInfo.header = cloudHeader;
         cloudInfo.cloud_deskewed  = publishCloud(&pubExtractedCloud, extractedCloud, cloudHeader.stamp, lidarFrame);
         pubLaserCloudInfo.publish(cloudInfo);

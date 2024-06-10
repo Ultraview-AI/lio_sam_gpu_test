@@ -16,6 +16,8 @@
 #include <gtsam/nonlinear/ISAM2.h>
 #include <gtsam_unstable/nonlinear/IncrementalFixedLagSmoother.h>
 
+#include "swri_profiler/profiler.h"
+
 using gtsam::symbol_shorthand::X; // Pose3 (x,y,z,r,p,y)
 using gtsam::symbol_shorthand::V; // Vel   (xdot,ydot,zdot)
 using gtsam::symbol_shorthand::B; // Bias  (ax,ay,az,gx,gy,gz)
@@ -43,6 +45,7 @@ public:
 
     TransformFusion()
     {
+        SWRI_PROFILE("transform-fusion-imu");
         if(lidarFrame != baselinkFrame)
         {
             try
@@ -65,6 +68,7 @@ public:
 
     Eigen::Affine3f odom2affine(nav_msgs::Odometry odom)
     {
+        SWRI_PROFILE("odom-to-affine-imu");
         double x, y, z, roll, pitch, yaw;
         x = odom.pose.pose.position.x;
         y = odom.pose.pose.position.y;
@@ -77,6 +81,7 @@ public:
 
     void lidarOdometryHandler(const nav_msgs::Odometry::ConstPtr& odomMsg)
     {
+        SWRI_PROFILE("lidar-odometry-handler-imu");
         std::lock_guard<std::mutex> lock(mtx);
 
         lidarOdomAffine = odom2affine(*odomMsg);
@@ -86,6 +91,7 @@ public:
 
     void imuOdometryHandler(const nav_msgs::Odometry::ConstPtr& odomMsg)
     {
+        SWRI_PROFILE("imu-odometry-handler-imu");
         // static tf
         static tf::TransformBroadcaster tfMap2Odom;
         static tf::Transform map_to_odom = tf::Transform(tf::createQuaternionFromRPY(0, 0, 0), tf::Vector3(0, 0, 0));
@@ -204,6 +210,7 @@ public:
 
     IMUPreintegration()
     {
+        SWRI_PROFILE("imu-preintegration-constructor-imu");
         subImu      = nh.subscribe<sensor_msgs::Imu>  (imuTopic,                   2000, &IMUPreintegration::imuHandler,      this, ros::TransportHints().tcpNoDelay());
         subOdometry = nh.subscribe<nav_msgs::Odometry>("lio_sam/mapping/odometry_incremental", 5,    &IMUPreintegration::odometryHandler, this, ros::TransportHints().tcpNoDelay());
 
@@ -228,6 +235,7 @@ public:
 
     void resetOptimization()
     {
+        SWRI_PROFILE("reset-optimization-imu");
         gtsam::ISAM2Params optParameters;
         optParameters.relinearizeThreshold = 0.1;
         optParameters.relinearizeSkip = 1;
@@ -242,6 +250,7 @@ public:
 
     void resetParams()
     {
+        SWRI_PROFILE("reset-params-imu");
         lastImuT_imu = -1;
         doneFirstOpt = false;
         systemInitialized = false;
@@ -249,6 +258,7 @@ public:
 
     void odometryHandler(const nav_msgs::Odometry::ConstPtr& odomMsg)
     {
+        SWRI_PROFILE("odometry-handler-imu");
         std::lock_guard<std::mutex> lock(mtx);
 
         double currentCorrectionTime = ROS_TIME(odomMsg);
@@ -435,6 +445,7 @@ public:
 
     bool failureDetection(const gtsam::Vector3& velCur, const gtsam::imuBias::ConstantBias& biasCur)
     {
+        SWRI_PROFILE("failure-detection-imu");
         Eigen::Vector3f vel(velCur.x(), velCur.y(), velCur.z());
         if (vel.norm() > 30)
         {
@@ -455,6 +466,7 @@ public:
 
     void imuHandler(const sensor_msgs::Imu::ConstPtr& imu_raw)
     {
+        SWRI_PROFILE("imu-handler-imu");
         std::lock_guard<std::mutex> lock(mtx);
 
         sensor_msgs::Imu thisImu = imuConverter(*imu_raw);

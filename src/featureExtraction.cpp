@@ -1,5 +1,6 @@
 #include "utility.h"
 #include "lio_sam/cloud_info.h"
+#include "swri_profiler/profiler.h"
 
 struct smoothness_t{ 
     float value;
@@ -50,6 +51,7 @@ public:
 
     void initializationValue()
     {
+        SWRI_PROFILE("initialize-value-feature");
         cloudSmoothness.resize(N_SCAN*Horizon_SCAN);
 
         downSizeFilter.setLeafSize(odometrySurfLeafSize, odometrySurfLeafSize, odometrySurfLeafSize);
@@ -65,6 +67,7 @@ public:
 
     void laserCloudInfoHandler(const lio_sam::cloud_infoConstPtr& msgIn)
     {
+        SWRI_PROFILE("laser-cloud-info-handler-feature");
         cloudInfo = *msgIn; // new cloud info
         cloudHeader = msgIn->header; // new cloud header
         pcl::fromROSMsg(msgIn->cloud_deskewed, *extractedCloud); // new cloud for extraction
@@ -80,6 +83,7 @@ public:
 
     void calculateSmoothness()
     {
+        SWRI_PROFILE("calculate-smoothness-feature");
         int cloudSize = extractedCloud->points.size();
         for (int i = 5; i < cloudSize - 5; i++)
         {
@@ -102,6 +106,7 @@ public:
 
     void markOccludedPoints()
     {
+        SWRI_PROFILE("mark-occluded-points-feature");
         int cloudSize = extractedCloud->points.size();
         // mark occluded points and parallel beam points
         for (int i = 5; i < cloudSize - 6; ++i)
@@ -140,6 +145,7 @@ public:
 
     void extractFeatures()
     {
+        SWRI_PROFILE("extract-features-feature");
         cornerCloud->clear();
         surfaceCloud->clear();
 
@@ -239,6 +245,7 @@ public:
 
     void freeCloudInfoMemory()
     {
+        SWRI_PROFILE("free-cloud-info-memory-feature");
         cloudInfo.startRingIndex.clear();
         cloudInfo.endRingIndex.clear();
         cloudInfo.pointColInd.clear();
@@ -247,6 +254,7 @@ public:
 
     void publishFeatureCloud()
     {
+        SWRI_PROFILE("publish-feature-cloud-feature");
         // free cloud info memory
         freeCloudInfoMemory();
         // save newly extracted features
