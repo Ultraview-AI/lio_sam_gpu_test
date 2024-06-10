@@ -765,6 +765,7 @@ public:
 
     void updateInitialGuess()
     {   
+        SWRI_PROFILE("update-initial-guess");
         // static int count = 0;
         // count++;
         // std::cout << "count : " << count << std::endl;
@@ -933,6 +934,7 @@ public:
 
     void extractSurroundingKeyFrames()
     {
+        SWRI_PROFILE("extract-surrounding-keyframes");
         if (cloudKeyPoses3D->points.empty() == true)
             return; 
         
@@ -948,6 +950,7 @@ public:
 
     void downsampleCurrentScan()
     {
+        SWRI_PROFILE("downsample-current-scan");
         // Downsample cloud from current scan
         laserCloudCornerLastDS->clear();
         downSizeFilterCorner.setInputCloud(laserCloudCornerLast);
@@ -1619,6 +1622,7 @@ public:
 
     void saveKeyFramesAndFactor()
     {
+        SWRI_PROFILE("save-keyframes-and-factor");
         if (saveFrame() == false)
             return;
 
@@ -1705,6 +1709,7 @@ public:
 
     void correctPoses()
     {
+        SWRI_PROFILE("correct-poses");
         if (cloudKeyPoses3D->points.empty())
             return;
 
@@ -1755,6 +1760,7 @@ public:
 
     void publishOdometry()
     {
+        SWRI_PROFILE("publish-odometry");
         // Publish odometry for ROS (global)
         nav_msgs::Odometry laserOdometryROS;
         laserOdometryROS.header.stamp = timeLaserInfoStamp;
@@ -1844,6 +1850,7 @@ public:
 
     void publishFrames()
     {
+        SWRI_PROFILE("publish-frames");
         if (cloudKeyPoses3D->points.empty())
             return;
         // publish key poses
